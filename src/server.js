@@ -9,7 +9,7 @@ const PORT = 5000
 const app = express()
 
 // setting up view engine
-app.set('view engine','pug') 
+app.set('view engine', 'pug')
 
 // setting views folder and importing join property from path
 app.set('views', join(__dirname, 'views'))
@@ -17,17 +17,20 @@ app.set('views', join(__dirname, 'views'))
 app.use(logger('dev'))
 
 //setting up static files
-app.use(express.static(join(__dirname,'static')))
+app.use(express.static(join(__dirname, 'static')))
 
 // home link
 app.get('/', (req, res) => res.render('home'))
- 
+
 // setting up server
 const handleListening = () => console.log(`✔ Server Running: http://localhost:${PORT}`)
 
 const server = app.listen(PORT, handleListening);
 
 // putting WS over HTTP server
-const io = socketIO(server)
+// ERROR HERE
+const io = socketIO.listen(server)
 
-io.on('connection',(socket) => console.log(socket))
+io.on('connection', (socket) => {
+    socket.emit('hello')
+})
