@@ -1,36 +1,25 @@
-import { join } from 'path'
-import express from 'express'
-import socketIO from 'socket.io'
-import logger from 'morgan'
-// port number 
-const PORT = 5000
+import { join } from "path";
+import express from "express";
+import socketIO from "socket.io";
+import logger from "morgan";
+import socketController from "./socketController";
+import events from "./events";
 
+const PORT = 4000;
+const app = express();
+app.set("view engine", "pug");
+app.set("views", join(__dirname, "views"));
+app.use(logger("dev"));
+app.use(express.static(join(__dirname, "static")));
+app.get("/", (req, res) =>
+  res.render("home", { events: JSON.stringify(events) })
+);
 
-const app = express()
-
-// setting up view engine
-app.set('view engine', 'pug')
-
-// setting views folder and importing join property from path
-app.set('views', join(__dirname, 'views'))
-
-app.use(logger('dev'))
-
-//setting up static files
-app.use(express.static(join(__dirname, 'static')))
-
-// home link
-app.get('/', (req, res) => res.render('home'))
-
-// setting up server
-const handleListening = () => console.log(`✔ Server Running: http://localhost:${PORT}`)
+const handleListening = () =>
+  console.log(`✅ Server running: http://localhost:${PORT}`);
 
 const server = app.listen(PORT, handleListening);
 
-// putting WS over HTTP server
-// ERROR HERE
-const io = socketIO.listen(server)
+const io = socketIO.listen(server);
 
-io.on('connection', (socket) => {
-    socket.emit('hello')
-})
+io.on("connection", socket => socketController(socket, io));
